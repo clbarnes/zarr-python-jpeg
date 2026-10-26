@@ -1,0 +1,29 @@
+[project]
+name = "zarr-jpeg"
+version = "0.1.0"
+description = "jpeg codec for zarr-python"
+readme = "README.md"
+authors = [{ name = "Chris Barnes", email = "chris.barnes@gerbi-gmb.de" }]
+requires-python = ">=3.12"
+dependencies = [
+    "pillow>=13.0.0",
+    # "imagecodecs>=2026.10.10",
+    # "pyturbojpeg>=2.6.1",
+    "zarr>=3.4.1",
+]
+
+[project.entry-points."zarr.codecs"]
+jpeg = "zarr_jpeg:JpegCodec"
+
+[build-system]
+requires = ["uv_build>=0.13.5,<0.14.0"]
+build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+    { include-group = "test" },
+    { include-group = "lint" },
+    "zarr-template>=0.1.0",
+]
+test = ["pytest>=9.1.1", "imageio>=2.38.1"]
+lint = ["mypy>=2.4.0", "ruff>=0.17.1"]
