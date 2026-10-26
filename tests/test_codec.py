@@ -7,7 +7,7 @@ from PIL import Image
 from zarr.storage import MemoryStore
 from zarr_template import TemplateChunkKeyEncoding
 
-from zarr_jpeg import JpegCodec, SamplingFactor
+from zarr_jpeg import JpegCodec
 
 
 def check_roundtrip(
@@ -40,16 +40,7 @@ def check_roundtrip(
 def test_roundtrip_rgb(astronaut: np.ndarray):
     check_roundtrip(
         astronaut,
-        JpegCodec(
-            90,
-            (
-                SamplingFactor.trivial(),
-                SamplingFactor.trivial(),
-                SamplingFactor.trivial(),
-            ),
-            "rgb",
-            "rgb",
-        ),
+        JpegCodec.builder("rgb").build(),
         (256, 256, 3),
     )
 
@@ -57,12 +48,7 @@ def test_roundtrip_rgb(astronaut: np.ndarray):
 def test_roundtrip_ycbcr(astronaut: np.ndarray):
     check_roundtrip(
         astronaut,
-        JpegCodec(
-            90,
-            (SamplingFactor(2, 2), SamplingFactor.trivial(), SamplingFactor.trivial()),
-            "ycbcr",
-            "rgb",
-        ),
+        JpegCodec.builder("ycbcr").chroma_subsampling(2, 2).build(),
         (256, 256, 3),
     )
 
@@ -70,12 +56,7 @@ def test_roundtrip_ycbcr(astronaut: np.ndarray):
 def test_roundtrip_grayscale(astronaut: np.ndarray):
     check_roundtrip(
         astronaut[:, :, 0],
-        JpegCodec(
-            90,
-            (SamplingFactor.trivial(),),
-            "grayscale",
-            "grayscale",
-        ),
+        JpegCodec.builder("grayscale").build(),
         (256, 256),
     )
 
@@ -83,11 +64,6 @@ def test_roundtrip_grayscale(astronaut: np.ndarray):
 def test_roundtrip_chunk_to_grayscale(astronaut: np.ndarray):
     check_roundtrip(
         astronaut,
-        JpegCodec(
-            90,
-            (SamplingFactor.trivial(),),
-            "grayscale",
-            "grayscale",
-        ),
+        JpegCodec.builder("grayscale").build(),
         (256, 256, 1),
     )
