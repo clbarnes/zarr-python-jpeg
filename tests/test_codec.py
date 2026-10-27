@@ -8,6 +8,7 @@ from zarr.storage import MemoryStore
 from zarr_template import TemplateChunkKeyEncoding
 
 from zarr_jpeg import JpegCodec
+from zarr_jpeg.util import rgb_to_ycbcr
 
 
 def check_roundtrip(
@@ -45,11 +46,19 @@ def test_roundtrip_rgb(astronaut: np.ndarray):
     )
 
 
-def test_roundtrip_ycbcr(astronaut: np.ndarray):
+def test_roundtrip_rgb_ycbcr(astronaut: np.ndarray):
     check_roundtrip(
         astronaut,
         JpegCodec.builder("ycbcr").chroma_subsampling(2, 2).build(),
         (256, 256, 3),
+    )
+
+
+def test_roundtrip_ycbcr(astronaut: np.ndarray):
+    ycbcr = rgb_to_ycbcr(astronaut)
+    check_roundtrip(
+        ycbcr,
+        JpegCodec.builder("ycbcr").encode_from_ycbcr().chroma_subsampling(2, 2).build(),
     )
 
 

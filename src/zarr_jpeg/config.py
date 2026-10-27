@@ -70,6 +70,11 @@ class SamplingFactor:
 
 @dataclass(frozen=True)
 class JpegCodec(ArrayBytesCodec):
+    """Array-to-bytes codec for JPEG compression.
+
+    It is recommended to use `JpegCodec.builder()` to construct the codec.
+    """
+
     quality: int
     subsampling: tuple[SamplingFactor, ...]
     encoded_color_space: ColorSpace
@@ -247,26 +252,38 @@ class JpegCodecBuilder:
         self._quality = 95
 
     def encode_from_ycbcr(self) -> Self:
-        """Errors unless encoded_color_space is ycbcr"""
+        """Decoded pixels are in interleaved YCbCr format.
+
+        Defaults to `False` (expects interleaved RGB pixels).
+        Errors unless encoded_color_space is `"ycbcr"`."""
         if self._encoded_color_space != "ycbcr":
             raise ValueError("Can only encode ycbcr from ycbcr")
         self._decoded_color_space = "ycbcr"
         return self
 
     def chroma_subsampling(self, horizontal: int, vertical: int) -> Self:
-        """Errors unless encoded_color_space is ycbcr"""
+        """Number of horizontal and vertical luminance pixels per chrominance pixel.
+
+        Defaults to `(1, 1)` (no subsampling).
+        Errors unless encoded_color_space is `"ycbcr"`.
+        """
         if self._encoded_color_space != "ycbcr":
             raise ValueError("Can only subsamble ycbcr-encoded data")
         self._subsampling_first = SamplingFactor(horizontal, vertical)
         return self
 
     def quality(self, quality: int) -> Self:
+        """Quality in `[0, 100]`.
+
+        Defaults to 95.
+        """
         if quality < 0 or quality > 100:
             raise ValueError("quality must be in [0, 100]")
         self._quality = quality
         return self
 
     def build(self) -> JpegCodec:
+        """Build the codec."""
         trivial_subsamps = COLORSPACES[self._encoded_color_space].n_components - 1
         subsamps = [self._subsampling_first] + [
             SamplingFactor.trivial()
