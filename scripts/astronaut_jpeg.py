@@ -15,9 +15,9 @@ import numpy as np
 import zarr
 from zarr_template import TemplateChunkKeyEncoding
 
-from zarr_jpeg import JpegCodec
-from zarr_jpeg.pillow import pillow_encode
-from zarr_jpeg.util import rgb_to_ycbcr
+from zarr_ext_jpeg import JpegCodec
+from zarr_ext_jpeg.pillow import pillow_encode
+from zarr_ext_jpeg.util import rgb_to_ycbcr
 
 logger = logging.getLogger(__name__)
 HERE = Path(__file__).resolve().parent

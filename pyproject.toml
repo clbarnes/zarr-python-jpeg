@@ -1,5 +1,5 @@
 [project]
-name = "zarr-jpeg"
+name = "zarr-ext-jpeg"
 version = "0.1.0"
 description = "jpeg codec for zarr-python"
 readme = "README.md"
@@ -11,7 +11,7 @@ dependencies = [
 ]
 
 [project.entry-points."zarr.codecs"]
-jpeg = "zarr_jpeg:JpegCodec"
+jpeg = "zarr_ext_jpeg:JpegCodec"
 
 [build-system]
 requires = ["uv_build>=0.13.6,<0.14.0"]

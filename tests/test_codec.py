@@ -7,8 +7,8 @@ from PIL import Image
 from zarr.storage import MemoryStore
 from zarr_template import TemplateChunkKeyEncoding
 
-from zarr_jpeg import JpegCodec
-from zarr_jpeg.util import rgb_to_ycbcr
+from zarr_ext_jpeg import JpegCodec
+from zarr_ext_jpeg.util import rgb_to_ycbcr
 
 
 def check_roundtrip(

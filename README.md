@@ -1,4 +1,4 @@
-# zarr-jpeg
+# zarr-ext-jpeg
 
 > Warning: the jpeg codec is not yet stable and may change.
 
@@ -12,13 +12,13 @@ to give all chunks the `.jpeg` extension so that they can be previewed by extens
 
 ## Usage
 
-Simply installing `zarr-jpeg` (e.g. with pip or uv) will allow you to decode JPEG-encoded chunks when using zarr-python.
+Simply installing `zarr-ext-jpeg` (e.g. with pip or uv) will allow you to decode JPEG-encoded chunks when using zarr-python.
 
 To create JPEG-encoded arrays, use the builder pattern to ensure that your codec is valid:
 
 ```python
 from zarr.storage import MemoryStore
-from zarr_jpeg import JpegCodec
+from zarr_ext_jpeg import JpegCodec
 import numpy as np
 
 my_codec = (
@@ -82,7 +82,13 @@ At time of writing, by default `zarr-python` applies an additional bytes-to-byte
 As JPEG compresses quite effectively, this will likely not reduce your data size much and cost processing time;
 explicitly set `compressors=[]` on array creation.
 
-## Difference between `jpeg` and `imagecodecs_jpeg`
+## Difference between `jpeg` and `imagecodecs_jpeg` codecs
 
 `jpeg` is a registered zarr extension with implementations in multiple languages, targeting a minimal common API surface.
 `imagecodecs_jpeg` supports more features, but is specified only by the details of a single implementation.
+
+## Difference between `zarr-ext-jpeg` and `zarr-jpeg` packages
+
+[zarr-jpeg](https://github.com/d-v-b/zarr-jpeg/) is a Zarr v2-era package which predates the current `jpeg` extension codec specification,
+and indeed the Zarr v3 extension concept.
+It is non-standard and defined only by the one implementation.
