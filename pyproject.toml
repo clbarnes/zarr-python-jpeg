@@ -27,3 +27,7 @@ dev = [
 ]
 test = ["pytest>=9.1.1"]
 lint = ["mypy>=2.4.0", "ruff>=0.17.1"]
+
+[[tool.mypy.overrides]]
+module = ["zarr_template.*"]
+follow_untyped_imports = true
