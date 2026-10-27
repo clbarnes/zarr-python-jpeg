@@ -17,6 +17,7 @@ from zarr_template import TemplateChunkKeyEncoding
 
 from zarr_jpeg import JpegCodec
 from zarr_jpeg.pillow import pillow_encode
+from zarr_jpeg.util import rgb_to_ycbcr
 
 logger = logging.getLogger(__name__)
 HERE = Path(__file__).resolve().parent
@@ -35,6 +36,7 @@ class Examples:
         assert raw.ndim == 3
         assert raw.shape[-1] == 3
         self.raw = raw
+        self.chunk_yx = (self.raw.shape[0], self.raw.shape[1] // 2)
 
     def write_output(
         self,
@@ -65,20 +67,35 @@ class Examples:
             compressors=[],
         )
 
-    def rgb(self) -> zarr.Array:
+    def _chunks(self, channels: int | None = 3) -> tuple[int, ...]:
+        if channels is None:
+            return self.chunk_yx
+        return self.chunk_yx + (channels,)
+
+    def rgb_rgb(self) -> zarr.Array:
         codec = JpegCodec.builder("rgb").build()
         return self.write_output(
-            codec, self.raw, "rgb", chunks=(256, 256, 3), chunk_key_encoding=None
+            codec, self.raw, "rgb_rgb", chunks=self._chunks(), chunk_key_encoding=None
         )
 
-    def ycbcr(self) -> zarr.Array:
+    def ycbcr_ycbcr(self) -> zarr.Array:
+        ycbcr = rgb_to_ycbcr(self.raw)
+        codec = (
+            JpegCodec.builder("ycbcr")
+            .encode_from_ycbcr()
+            .chroma_subsampling(2, 2)
+            .build()
+        )
+        return self.write_output(codec, ycbcr, "ycbcr_ycbcr", chunks=self._chunks())
+
+    def rgb_ycbcr(self) -> zarr.Array:
         codec = JpegCodec.builder("ycbcr").chroma_subsampling(2, 2).build()
-        return self.write_output(codec, self.raw, "ycbcr", chunks=(256, 256, 3))
+        return self.write_output(codec, self.raw, "rgb_ycbcr", chunks=self._chunks())
 
     def grayscale(self) -> zarr.Array:
         codec = JpegCodec.builder("grayscale").build()
         return self.write_output(
-            codec, self.raw[:, :, 0], "grayscale", chunks=(256, 256)
+            codec, self.raw[:, :, 0], "grayscale", chunks=self._chunks(None)
         )
 
     def grayscale_chunks(self) -> zarr.Array:
@@ -88,17 +105,20 @@ class Examples:
             codec,
             self.raw,
             "chunk_to_grayscale",
-            chunks=(256, 256, 1),
+            chunks=self._chunks(1),
             write_jpeg=False,
         )
 
     def lowqual(self) -> zarr.Array:
         codec = JpegCodec.builder("ycbcr").chroma_subsampling(2, 2).quality(50).build()
-        return self.write_output(codec, self.raw, "ycbcr_lowqual", chunks=(256, 256, 3))
+        return self.write_output(
+            codec, self.raw, "ycbcr_lowqual", chunks=self._chunks()
+        )
 
     def write_all(self) -> None:
-        self.rgb()
-        self.ycbcr()
+        self.rgb_rgb()
+        self.ycbcr_ycbcr()
+        self.rgb_ycbcr()
         self.grayscale()
         self.grayscale_chunks()
         self.lowqual()
