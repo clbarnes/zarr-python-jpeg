@@ -8,6 +8,9 @@ import numpy as np
 from PIL import Image
 
 if typing.TYPE_CHECKING:
+    from PIL.Image import Image as PILImage
+    from PIL.ImageFile import ImageFile
+
     from .config import JpegCodec, SamplingFactor
 
 logger = logging.getLogger(__name__)
@@ -59,6 +62,7 @@ def pillow_encode(codec: JpegCodec, array: np.ndarray) -> bytes:
 
 
 def pillow_decode(codec: JpegCodec, buf: bytes, shape: tuple[int, ...]) -> np.ndarray:
+    img: PILImage | ImageFile
     with Image.open(io.BytesIO(buf), formats=["JPEG"]) as img:
         match codec.decoded_color_space:
             case "rgb":
