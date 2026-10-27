@@ -81,7 +81,7 @@ class JpegCodec(ArrayBytesCodec):
     decoded_color_space: ColorSpace
 
     def to_dict(self) -> dict[str, JSON]:
-        d = {
+        d: dict[str, JSON] = {
             "quality": self.quality,
             "subsampling": tuple(
                 (sf.horizontal, sf.vertical) for sf in self.subsampling

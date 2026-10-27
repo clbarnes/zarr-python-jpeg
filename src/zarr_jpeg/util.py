@@ -1,5 +1,7 @@
 import numpy as np
 
+type BytesLike = bytes | bytearray | memoryview
+
 
 def rgb_to_ycbcr(rgb: np.ndarray) -> np.ndarray:
     """Convert interleaved uint8 RGB into interleaved uint8 full-range (JFIF) YCbCr."""
