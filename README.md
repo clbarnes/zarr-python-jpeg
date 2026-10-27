@@ -5,9 +5,9 @@
 The [`jpeg` extension codec](https://github.com/zarr-developers/zarr-extensions/pull/66) for [zarr-python](https://pypi.org/project/zarr/).
 
 The JPEG codec is an array-to-bytes codec (aka "serializer") for compressing 2D data with 1 or 3 channels, where the channel axis must come last.
-Use the `reshape` and/or `transpose` codecs to rearrange any arrays which do not fit this pattern.
+Use the [`reshape`](https://github.com/zarr-developers/zarr-extensions/tree/main/codecs/reshape) and/or [`transpose`](https://zarr-specs.readthedocs.io/en/latest/v3/codecs/transpose/index.html) codecs to rearrange any arrays which do not fit this pattern.
 
-You may also be interested in the `template` chunk key encoding,
+You may also be interested in the [`template`](https://github.com/zarr-developers/zarr-extensions/tree/main/chunk-key-encodings/template) chunk key encoding,
 to give all chunks the `.jpeg` extension so that they can be previewed by extension-sensitive browsers.
 
 ## Usage
@@ -23,15 +23,15 @@ import numpy as np
 
 my_codec = (
     JpegCodec
-        # encoded color space:
-        # determines which other parameters are valid
-        .builder("ycbcr")
-        # 2 horizontal and 2 vertical luminance pixels
-        # per chrominance pixel
-        .chroma_subsampling(2, 2)
-        # defaults to 95 if not given
-        .quality(75)
-        .build()
+    # encoded color space:
+    # determines which other parameters are valid
+    .builder("ycbcr")
+    # 2 horizontal and 2 vertical luminance pixels
+    # per chrominance pixel
+    .chroma_subsampling(2, 2)
+    # defaults to 95 if not given
+    .quality(75)
+    .build()
 )
 
 store = MemoryStore()
@@ -63,7 +63,7 @@ Lower values introduce more artifacts.
 ### Channels
 
 If your data doesn't have exactly 1 or 3 channels,
-consider using the chunk configuration or sharding to make the channel axis length 1,
+consider using the chunk configuration or sharding to make the chunk's channel axis length 1,
 and then using grayscale encoding.
 
 If you have 3 channels but they are not the red/green/blue (or YCbCr) of a natural scene,
@@ -75,6 +75,12 @@ The default RGB->YCbCr color transform may introduce additional artifacts.
 JPEGs are encoded in Minimum Coded Units whose shape depends on the chroma subsampling used.
 MCUs are 8x8 pixels, multiplied by the chroma subsampling ratio: e.g. for a subsampling ratio of `[4, 1]`, the MCU would have shape `(32, 8)`.
 The first two elements of your chunk shape SHOULD be a multiple of this MCU shape.
+
+### Additional compression
+
+At time of writing, by default `zarr-python` applies an additional bytes-to-bytes codec ("compressor") if none is specified.
+As JPEG compresses quite effectively, this will likely not reduce your data size much and cost processing time;
+explicitly set `compressors=[]` on array creation.
 
 ## Difference between `jpeg` and `imagecodecs_jpeg`
 
