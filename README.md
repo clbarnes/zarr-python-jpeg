@@ -10,6 +10,10 @@ Use the [`reshape`](https://github.com/zarr-developers/zarr-extensions/tree/main
 You may also be interested in the [`template`](https://github.com/zarr-developers/zarr-extensions/tree/main/chunk-key-encodings/template) chunk key encoding,
 to give all chunks the `.jpeg` extension so that they can be previewed by extension-sensitive browsers.
 
+Note that the repository is called `zarr-python-jpeg`;
+the package is called `zarr-ext-jpeg`;
+and the import name is `zarr_ext_jpeg`.
+
 ## Usage
 
 Simply installing `zarr-ext-jpeg` (e.g. with pip or uv) will allow you to decode JPEG-encoded chunks when using zarr-python.

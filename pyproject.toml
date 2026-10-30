@@ -10,6 +10,10 @@ dependencies = [
     "zarr>=3.4.1",
 ]
 
+[project.urls]
+Documentation = "https://zarr-python-jpeg.readthedocs.io"
+Repository = "https://github.com/clbarnes/zarr-python-jpeg"
+
 [project.entry-points."zarr.codecs"]
 jpeg = "zarr_ext_jpeg:JpegCodec"
 
