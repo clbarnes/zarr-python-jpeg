@@ -17,6 +17,7 @@ Simply installing `zarr-ext-jpeg` (e.g. with pip or uv) will allow you to decode
 To create JPEG-encoded arrays, use the builder pattern to ensure that your codec is valid:
 
 ```python
+import zarr
 from zarr.storage import MemoryStore
 from zarr_ext_jpeg import JpegCodec
 import numpy as np
@@ -34,9 +35,10 @@ my_codec = (
     .build()
 )
 
-store = MemoryStore()
 rng = np.random.default_rng(1991)
-data = rng.randint(0, 256, (10, 20), "uint8")
+data = rng.integers(0, 256, (10, 20, 3), "uint8")
+
+store = MemoryStore()
 my_array = zarr.create_array(
     store,
     data=data,
@@ -44,6 +46,11 @@ my_array = zarr.create_array(
     # skip adding the default bytes-to-bytes codec(s)
     compressors=[],
 )
+data2 = np.asarray(my_array[:])
+assert data.shape == data2.shape
+assert data.dtype == data2.dtype
+# codec is lossy
+assert not np.array_equal(data, data2)
 ```
 
 ## Lossy encoding warning

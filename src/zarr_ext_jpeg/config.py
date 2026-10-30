@@ -18,6 +18,10 @@ from zarr.registry import register_codec
 from .pillow import pillow_decode, pillow_encode
 
 type ColorSpace = Literal["grayscale", "rgb", "ycbcr"]
+"""String literals for use as `encoded_color_space` and `decoded_color_space` values.
+
+Only certain combinations are valid.
+"""
 
 COLORSPACES: dict[ColorSpace, ColorSpaceInfo] = {}
 CODEC_NAME = "jpeg"
@@ -45,6 +49,17 @@ _register_colorspace(ColorSpaceInfo("ycbcr", 3, {"ycbcr"}, {"rgb", "ycbcr"}, "rg
 
 @dataclass(frozen=True)
 class SamplingFactor:
+    """Pair of integers in `[1, 4]` describing chroma subsampling.
+
+    The `jpeg` codec serialises an array of such pairs, one for each encoded component/channel;
+    in all valid cases, components other than the first (luminance) must be trivial, i.e. `(1, 1)`.
+
+    Used alone, then, a pair of sampling factors describes the width and height in luminance pixels
+    of a chrominance pixel.
+    e.g. a single `SamplingFactor(horizontal=4, vertical=2)` means that one chrominance pixel
+    is used for a block of 8 luminance pixels, 4 wide and 2 high.
+    """
+
     horizontal: int
     vertical: int
 
@@ -60,11 +75,13 @@ class SamplingFactor:
                 )
 
     def check_trivial(self):
+        """Error if the sampling factor pair is not `(1, 1)`."""
         if self.horizontal != 1 or self.vertical != 1:
             raise ValueError(f"Expected trivial sampling factor, got {self}")
 
     @classmethod
     def trivial(cls) -> SamplingFactor:
+        """Create a `(1, 1)` sampling factor pair."""
         return SamplingFactor(1, 1)
 
 
@@ -76,9 +93,20 @@ class JpegCodec(ArrayBytesCodec):
     """
 
     quality: int
+    """Integer in `[0, 100]`, where higher means more quality.
+
+    Above 95 increases file size greatly without significant perceptual gains.
+    Lower values result in more blocky images.
+    """
+
     subsampling: tuple[SamplingFactor, ...]
+    """Subsampling ratios, one `SamplingFactor` per component."""
+
     encoded_color_space: ColorSpace
+    """Color space of the encoded JPEG data. This will be written into the bytestream."""
+
     decoded_color_space: ColorSpace
+    """Color space of the raw/ decoded array data."""
 
     def to_dict(self) -> dict[str, JSON]:
         d: dict[str, JSON] = {
@@ -174,18 +202,6 @@ class JpegCodec(ArrayBytesCodec):
     def compute_encoded_size(
         self, input_byte_length: int, chunk_spec: ArraySpec
     ) -> int:
-        """Given an input byte length, this method returns the output byte length.
-        Raises a NotImplementedError for codecs with variable-sized outputs (e.g. compressors).
-
-        Parameters
-        ----------
-        input_byte_length : int
-        chunk_spec : ArraySpec
-
-        Returns
-        -------
-        int
-        """
         raise NotImplementedError
 
     def validate(
@@ -195,18 +211,6 @@ class JpegCodec(ArrayBytesCodec):
         dtype: ZDType[TBaseDType, TBaseScalar],
         chunk_grid: ChunkGridMetadata,
     ) -> None:
-        """Validates that the codec configuration is compatible with the array metadata.
-        Raises errors when the codec configuration is not compatible.
-
-        Parameters
-        ----------
-        shape : tuple[int, ...]
-            The array shape
-        dtype : np.dtype[Any]
-            The array data type
-        chunk_grid : ChunkGridMetadata
-            The array chunk grid metadata
-        """
         if dtype != UInt8():
             raise ValueError(f"JPEG codec is only defined for uint8 data, got {dtype}")
 
@@ -235,11 +239,17 @@ class JpegCodec(ArrayBytesCodec):
 
     @classmethod
     def builder(cls, encoded_color_space: ColorSpace) -> JpegCodecBuilder:
+        """Initialise a builder for the codec."""
         return JpegCodecBuilder(encoded_color_space)
 
 
 @dataclass(init=False)
 class JpegCodecBuilder:
+    """Builder for `JpegCodec` which makes it easier to construct valid metadata.
+
+    The only required parameter (given in the constructor) is the color space of the encoded JPEG data.
+    """
+
     _encoded_color_space: ColorSpace
     _decoded_color_space: ColorSpace
     _subsampling_first: SamplingFactor
@@ -255,7 +265,8 @@ class JpegCodecBuilder:
         """Decoded pixels are in interleaved YCbCr format.
 
         Defaults to `False` (expects interleaved RGB pixels).
-        Errors unless encoded_color_space is `"ycbcr"`."""
+        Errors unless `encoded_color_space` is `"ycbcr"`.
+        """
         if self._encoded_color_space != "ycbcr":
             raise ValueError("Can only encode ycbcr from ycbcr")
         self._decoded_color_space = "ycbcr"
@@ -265,7 +276,7 @@ class JpegCodecBuilder:
         """Number of horizontal and vertical luminance pixels per chrominance pixel.
 
         Defaults to `(1, 1)` (no subsampling).
-        Errors unless encoded_color_space is `"ycbcr"`.
+        Errors unless `encoded_color_space` is `"ycbcr"`.
         """
         if self._encoded_color_space != "ycbcr":
             raise ValueError("Can only subsamble ycbcr-encoded data")

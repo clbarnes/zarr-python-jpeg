@@ -1,4 +1,6 @@
 import io
+from collections.abc import Sequence
+from types import CodeType
 from typing import cast
 
 import numpy as np
@@ -76,3 +78,9 @@ def test_roundtrip_chunk_to_grayscale(astronaut: np.ndarray):
         JpegCodec.builder("grayscale").build(),
         (256, 256, 1),
     )
+
+
+def test_readme_examples(readme_blocks: Sequence[CodeType], subtests):
+    for idx, block in enumerate(readme_blocks):
+        with subtests.test(block=idx):
+            exec(block, {"__name__": "__readme__"})  # noqa: S102
