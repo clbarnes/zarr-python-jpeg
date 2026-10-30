@@ -10,6 +10,10 @@ dependencies = [
     "zarr>=3.4.1",
 ]
 
+[project.urls]
+Documentation = "https://zarr-python-jpeg.readthedocs.io"
+Repository = "https://github.com/clbarnes/zarr-python-jpeg"
+
 [project.entry-points."zarr.codecs"]
 jpeg = "zarr_ext_jpeg:JpegCodec"
 
@@ -23,11 +27,14 @@ dev = [
     { include-group = "lint" },
     "prek>=0.5.7",
     "rust-just>=1.59.0",
-    "zarr-template>=0.1.0",
+    "zarr-template>=0.1.1",
 ]
 test = ["pytest>=9.1.1"]
-lint = ["mypy>=2.4.0", "ruff>=0.17.1"]
-
-[[tool.mypy.overrides]]
-module = ["zarr_template.*"]
-follow_untyped_imports = true
+lint = [
+    "mypy>=2.4.0",
+    "pydoclint>=0.12.0",
+    "ruff>=0.17.1",
+]
+doc = [
+    "pdoc>=16.0.0",
+]

@@ -14,6 +14,7 @@ lint:
     uv run --group dev ruff check src tests
     uv run --group dev mypy src tests
     uv run --group dev ruff format --check src tests
+    uv run --group lint pydoclint src
 
 # Fix lint and formatting issues in the python package.
 fix:
@@ -27,3 +28,14 @@ repl:
 # Test the python package.
 test:
     uv run pytest -v
+
+# Generate documentation, by default under `./doc/html`.
+doc docdir='doc/html':
+    rm -rf {{docdir}}
+    mkdir -p {{docdir}}
+    uv run --group doc pdoc \
+        --output-directory {{docdir}} \
+        --no-include-undocumented \
+        --docformat numpy \
+        --search \
+        zarr_ext_jpeg
