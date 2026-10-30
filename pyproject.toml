@@ -1,6 +1,6 @@
 [project]
 name = "zarr-ext-jpeg"
-version = "0.1.0"
+version = "0.2.0"
 description = "jpeg codec for zarr-python"
 readme = "README.md"
 authors = [{ name = "Chris Barnes", email = "chris.barnes@gerbi-gmb.de" }]
