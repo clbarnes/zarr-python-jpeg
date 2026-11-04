@@ -103,3 +103,8 @@ explicitly set `compressors=[]` on array creation.
 [zarr-jpeg](https://github.com/d-v-b/zarr-jpeg/) is a Zarr v2-era package which predates the current `jpeg` extension codec specification,
 and indeed the Zarr v3 extension concept.
 It is non-standard and defined only by the one implementation.
+
+## Divergence from the spec
+
+The spec requires that subsampling is always given.
+This implementation always writes the subsampling, but if omitted from the configuration, will infer a trivial subsampling `[[1, 1], ...]`.

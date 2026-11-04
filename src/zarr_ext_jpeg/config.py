@@ -132,9 +132,6 @@ class JpegCodec(ArrayBytesCodec):
 
         config = cast(dict[str, JSON], data.get("configuration", {}))
 
-        ss = tuple(
-            SamplingFactor(*sf) for sf in cast(list[list[int]], config["subsampling"])
-        )
         enc_cs = cast(ColorSpace, config["encoded_color_space"])
         qual = cast(int, config["quality"])
         dec_cs = config.get("decoded_color_space")
@@ -142,6 +139,15 @@ class JpegCodec(ArrayBytesCodec):
             dec_cs = COLORSPACES[enc_cs].default_decodes_to
         else:
             dec_cs = cast(ColorSpace, dec_cs)
+
+        ss_raw = config.get("subsampling")
+        if ss_raw is None:
+            ss = (SamplingFactor.trivial(),) * COLORSPACES[enc_cs].n_components
+        else:
+            ss = tuple(
+                SamplingFactor(*sf)
+                for sf in cast(list[list[int]], config["subsampling"])
+            )
         return cls(qual, ss, enc_cs, dec_cs)
 
     def __post_init__(self):
