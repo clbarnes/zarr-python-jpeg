@@ -4,6 +4,7 @@ from types import CodeType
 from typing import cast
 
 import numpy as np
+import pytest
 import zarr
 from PIL import Image
 from zarr.storage import MemoryStore
@@ -79,6 +80,16 @@ def test_roundtrip_chunk_to_grayscale(astronaut: np.ndarray):
         JpegCodec.builder("grayscale").build(),
         (256, 256, 1),
     )
+
+
+@pytest.mark.parametrize("quality", [0, 101, 99.9])
+def test_bad_qualities(quality):
+    jso = {
+        "name": "jpeg",
+        "configuration": {"quality": quality, "encoded_color_space": "grayscale"},
+    }
+    with pytest.raises(ValueError):
+        JpegCodec.from_dict(jso)
 
 
 def test_omitted_subsampling():
