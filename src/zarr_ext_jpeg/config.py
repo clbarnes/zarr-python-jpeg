@@ -151,8 +151,8 @@ class JpegCodec(ArrayBytesCodec):
         return cls(qual, ss, enc_cs, dec_cs)
 
     def __post_init__(self):
-        if not isinstance(self.quality, int) or self.quality < 0 or self.quality > 100:
-            raise ValueError(f"JPEG quality must be from 0 to 100; got {self.quality}")
+        if not isinstance(self.quality, int) or self.quality < 1 or self.quality > 100:
+            raise ValueError(f"JPEG quality must be in [1, 100]; got {self.quality}")
 
         if (
             self.encoded_color_space
@@ -294,7 +294,7 @@ class JpegCodecBuilder:
 
         Defaults to 95.
         """
-        if quality < 0 or quality > 100:
+        if quality < 1 or quality > 100:
             raise ValueError("quality must be in [0, 100]")
         self._quality = quality
         return self
