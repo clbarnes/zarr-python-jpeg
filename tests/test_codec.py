@@ -10,6 +10,7 @@ from zarr.storage import MemoryStore
 from zarr_template import TemplateChunkKeyEncoding
 
 from zarr_ext_jpeg import JpegCodec
+from zarr_ext_jpeg.config import SamplingFactor
 from zarr_ext_jpeg.util import rgb_to_ycbcr
 
 
@@ -78,6 +79,25 @@ def test_roundtrip_chunk_to_grayscale(astronaut: np.ndarray):
         JpegCodec.builder("grayscale").build(),
         (256, 256, 1),
     )
+
+
+def test_omitted_subsampling():
+    jso = {
+        "name": "jpeg",
+        "configuration": {
+            "quality": 90,
+            "encoded_color_space": "ycbcr",
+            "decoded_color_space": "rgb",
+        },
+    }
+    parsed = JpegCodec.from_dict(jso)
+    expected = JpegCodec(
+        90,
+        (SamplingFactor(1, 1), SamplingFactor(1, 1), SamplingFactor(1, 1)),
+        encoded_color_space="ycbcr",
+        decoded_color_space="rgb",
+    )
+    assert parsed == expected
 
 
 def test_readme_examples(readme_blocks: Sequence[CodeType], subtests):
