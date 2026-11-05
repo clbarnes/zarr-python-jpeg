@@ -114,8 +114,8 @@ class JpegCodec(ArrayBytesCodec):
             "encoded_color_space": self.encoded_color_space,
         }
         if (
-            self.encoded_color_space != "ycbcr"
-            and self.subsampling[0] == SamplingFactor.trivial()
+            self.encoded_color_space == "ycbcr"
+            or self.subsampling[0] != SamplingFactor.trivial()
         ):
             d["subsampling"] = tuple(
                 (sf.horizontal, sf.vertical) for sf in self.subsampling

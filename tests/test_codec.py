@@ -111,6 +111,21 @@ def test_omitted_subsampling():
     assert parsed == expected
 
 
+def test_omitted_subsampling_writes():
+    jso = {
+        "name": "jpeg",
+        "configuration": {
+            "quality": 90,
+            "encoded_color_space": "ycbcr",
+            "decoded_color_space": "rgb",
+        },
+    }
+    parsed = JpegCodec.from_dict(jso)
+    jso2 = parsed.to_dict()
+    config = cast(dict, jso2["configuration"])
+    assert "subsampling" in config
+
+
 def test_readme_examples(readme_blocks: Sequence[CodeType], subtests):
     for idx, block in enumerate(readme_blocks):
         with subtests.test(block=idx):
