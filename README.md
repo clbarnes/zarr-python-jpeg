@@ -2,7 +2,7 @@
 
 > Warning: the jpeg codec is not yet stable and may change.
 
-The [`jpeg` extension codec](https://github.com/zarr-developers/zarr-extensions/pull/66) for [zarr-python](https://pypi.org/project/zarr/).
+The [`jpeg` extension codec](https://github.com/zarr-developers/zarr-extensions/tree/main/codecs/jpeg) for [zarr-python](https://pypi.org/project/zarr/).
 
 The JPEG codec is an array-to-bytes codec (aka "serializer") for compressing 2D data with 1 or 3 channels, where the channel axis must come last.
 Use the [`reshape`](https://github.com/zarr-developers/zarr-extensions/tree/main/codecs/reshape) and/or [`transpose`](https://zarr-specs.readthedocs.io/en/latest/v3/codecs/transpose/index.html) codecs to rearrange any arrays which do not fit this pattern.
@@ -106,5 +106,6 @@ It is non-standard and defined only by the one implementation.
 
 ## Divergence from the spec
 
-The spec requires that subsampling is always given.
-This implementation always writes the subsampling, but if omitted from the configuration, will infer a trivial subsampling `[[1, 1], ...]`.
+The spec requires that subsampling is always given when `"encoded_color_space" = "ycbcr"`.
+This implementation infers trivial resampling (`[[1,1],[1,1],[1,1]]`) where omitted, as is the case for `"grayscale"` and `"rgb"`.
+Metadata is written correctly.

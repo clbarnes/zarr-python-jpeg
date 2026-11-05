@@ -111,11 +111,16 @@ class JpegCodec(ArrayBytesCodec):
     def to_dict(self) -> dict[str, JSON]:
         d: dict[str, JSON] = {
             "quality": self.quality,
-            "subsampling": tuple(
-                (sf.horizontal, sf.vertical) for sf in self.subsampling
-            ),
             "encoded_color_space": self.encoded_color_space,
         }
+        if (
+            self.encoded_color_space != "ycbcr"
+            and self.subsampling[0] == SamplingFactor.trivial()
+        ):
+            d["subsampling"] = tuple(
+                (sf.horizontal, sf.vertical) for sf in self.subsampling
+            )
+
         if (
             COLORSPACES[self.encoded_color_space].default_decodes_to
             != self.decoded_color_space
