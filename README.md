@@ -14,6 +14,8 @@ Note that the repository is called `zarr-python-jpeg`;
 the package is called `zarr-ext-jpeg`;
 and the import name is `zarr_ext_jpeg`.
 
+Version 0.3 is the first to support the released `jpeg` spec.
+
 ## Usage
 
 Simply installing `zarr-ext-jpeg` (e.g. with pip or uv) will allow you to decode JPEG-encoded chunks when using zarr-python.
