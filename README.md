@@ -1,7 +1,5 @@
 # zarr-ext-jpeg
 
-> Warning: the jpeg codec is not yet stable and may change.
-
 The [`jpeg` extension codec](https://github.com/zarr-developers/zarr-extensions/tree/main/codecs/jpeg) for [zarr-python](https://pypi.org/project/zarr/).
 
 The JPEG codec is an array-to-bytes codec (aka "serializer") for compressing 2D data with 1 or 3 channels, where the channel axis must come last.
