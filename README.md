@@ -93,10 +93,12 @@ At time of writing, by default `zarr-python` applies an additional bytes-to-byte
 As JPEG compresses quite effectively, this will likely not reduce your data size much and cost processing time;
 explicitly set `compressors=[]` on array creation.
 
-## Difference between `jpeg` and `imagecodecs_jpeg` codecs
+## Other implementations
 
-`jpeg` is a registered zarr extension with implementations in multiple languages, targeting a minimal common API surface.
-`imagecodecs_jpeg` supports more features, but is specified only by the details of a single implementation.
+[imagecodecs](https://github.com/cgohlke/imagecodecs) (and by extension [imagecodecs-zarr](https://github.com/cgohlke/imagecodecs)) implements many different image and compression codecs and makes them available to zarr-python.
+Many of these codecs are not standardised and specific to the imagecodecs implementation.
+
+Now that the `jpeg` extension codec has been standardised and registered, imagecodecs has implemented the standard version also implemented here, and so supplies both `jpeg` and `imagecodecs_jpeg` codecs.
 
 ## Difference between `zarr-ext-jpeg` and `zarr-jpeg` packages
 
